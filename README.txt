@@ -1,0 +1,3 @@
+To use:
+-install SimpleCV from simplecv.org
+-run eyeDetect.py. If the "doTraining" variable at the bottom is False, it will display pupil centers graphically as shown in the report. Do that first, to verify lighting conditions, webcam field of view, etc. If "doTraining" is true, it will produce a Pygame window. Gaze at the mouse cursor for 1 second to let things stabilize, click the mouse, and repeat at a new position. When enough training data has been collected to yield a good fit (typically 10 to 30 clicks), a blue blur will appear centered at the predicted eye gaze position. You can continue to click to improve the fit.
