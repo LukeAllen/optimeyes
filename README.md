@@ -1,10 +1,12 @@
 Read the Optimeyes Theory Paper above to see principles of operation. The major advances relative to other code are:
--The virtual reference point, which uses multiple unreliable keypoints to derive a very reliable reference point on the face.
--The method of overlaying one eye's pupil-probability image on the other, to greatly increase confidence of the estimate.
+
+1. The virtual reference point, which uses multiple unreliable keypoints to derive a very reliable reference point on the face.
+2. The method of overlaying one eye's pupil-probability image on the other, to greatly increase confidence of the estimate.
 
 To use the project on your computer:
--install SimpleCV from simplecv.org
--run eyeDetect.py. 
+
+- install SimpleCV 1.3 from simplecv.org. Ensure your OpenCV version is 2.x (version 3.x changed some function signatures and is not supported yet)
+- run eyeDetect.py. 
 
 If the "doTraining" variable at the top of eyeDetect.py is False, it will display pupil centers graphically as shown in the report. Do that first, to verify lighting conditions, webcam field of view, etc. 
 
