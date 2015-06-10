@@ -15,7 +15,6 @@ true = True
 # circles should generally track your pupils, though less reliably than the green line.
 # If performance is bad, you can tweak the "TUNABLE PARAMETER" lines. (This is a big
 # area where improvement is needed; probably some learning of parameters.)
-
 # Set True to run the main program:
 # You click where you're looking, and, after around 10-20 such clicks,
 # the program will learn the correspondence and start drawing a blue blur
