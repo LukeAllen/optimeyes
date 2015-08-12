@@ -5,7 +5,8 @@ Read the Optimeyes Theory Paper above to see principles of operation. The major 
 
 To use the project on your computer:
 
-- install SimpleCV 1.3 from simplecv.org. Ensure your OpenCV version is 2.x (version 3.x changed some function signatures and is not supported yet)
+- Option 1 (easiest setup): use the "master" branch of this repo, and install SimpleCV 1.3 from simplecv.org. Ensure your OpenCV version is 2.x (version 3.x has different function signatures)
+- Option 2 (slightly higher performance): use the "opencv3" branch of this repo, and install OpenCV 3.0 from opencv.org.
 - run eyeDetect.py. 
 
 If the "doTraining" variable at the top of eyeDetect.py is False, it will display pupil centers graphically as shown in the report. Do that first, to verify lighting conditions, webcam field of view, etc. 
