@@ -1,6 +1,6 @@
-from SimpleCV import *
+#from SimpleCV import *
 import cv2
-import cv2.cv as cv
+#import cv2.cv as cv
 import numpy as np
 import ClassyVirtualReferencePoint as ClassyVirtualReferencePoint
 import ransac
@@ -96,7 +96,7 @@ def debugImg(arr):
     global showMainImg
     showMainImg=False;
     toShow = cv2.resize((arr-arr.min())*(1.0/(arr.max()-arr.min())),(0,0), fx=8,fy=8,interpolation=cv2.INTER_NEAREST)
-    cv2.imshow("preview",toShow)
+    cv2.imshow(WINDOW_NAME,toShow)
 
 # displays data that is stored in a sparse format. Uses the coords to draw the corresponding
 # element of the vector, on a blank image of dimensions shapeToCopy
@@ -134,8 +134,8 @@ def getPupilCenter(gray, getRawProbabilityImage=False):
 
     IRIS_RADIUS = gray.shape[0]*.75/2 #conservative-large estimate of iris radius TODO: make this a tracked parameter--pass a prior-probability of radius based on last few iris detections. TUNABLE PARAMETER
     #debugImg(gray)
-    dxn = cv2.Sobel(gray,cv2.cv.CV_32F,1,0,ksize=3) #optimization opportunity: blur the image once, then just subtract 2 pixels in x and 2 in y. Should be equivalent.
-    dyn = cv2.Sobel(gray,cv2.cv.CV_32F,0,1,ksize=3)
+    dxn = cv2.Sobel(gray,cv2.CV_32F,1,0,ksize=3) #optimization opportunity: blur the image once, then just subtract 2 pixels in x and 2 in y. Should be equivalent.
+    dyn = cv2.Sobel(gray,cv2.CV_32F,0,1,ksize=3)
     magnitudeSquared = np.square(dxn)+np.square(dyn)
 
     # ########### Pupil finding
@@ -206,8 +206,8 @@ def getEyeCorner(gray):
         gray = cv2.resize(gray, (0,0), fx=BLOWUP_FACTOR, fy=BLOWUP_FACTOR, interpolation=cv2.INTER_LINEAR)
     gray = gray.astype('float32')
     #debugImg(gray)
-    dxn = cv2.Sobel(gray,cv2.cv.CV_32F,1,0,ksize=3) #optimization opportunity: blur the image once, then just subtract 2 pixels in x and 2 in y. Should be equivalent.
-    dyn = cv2.Sobel(gray,cv2.cv.CV_32F,0,1,ksize=3)
+    dxn = cv2.Sobel(gray,cv2.CV_32F,1,0,ksize=3) #optimization opportunity: blur the image once, then just subtract 2 pixels in x and 2 in y. Should be equivalent.
+    dyn = cv2.Sobel(gray,cv2.CV_32F,0,1,ksize=3)
     magnitudeSquared = np.square(dxn)+np.square(dyn)
 ##    debugImg(np.sqrt(magnitudeSquared))
     # ########### Eye corner finding. TODO: limit gradients to search area
@@ -382,12 +382,13 @@ def multiplyProbImages(newProb, priorToMultiply, YXoffsetOfSecondWithinFirst, de
 
 
 ## img: cv2 image in uint8 format
-## cascade: object you made with cv2.CascadeClassifier("./haarcascade_frontalface_alt.xml")
+## cascade: object you made with cv2.CascadeClassifier("./haarcascades/haarcascade_frontalface_alt.xml")
 ## minimumFeatureSize (ySize,xSize) tuple holding the smallest object you'd be looking for. E.g. (30,30)
 ## returns a numpy ndarray where rects[0] is the first detection, and holds [minX, minY, maxX, maxY] where +Y = downward
-def detect(img, cascade, minimumFeatureSize):
-    #cv2.CascadeClassifier.detectMultiScale(image, rejectLevels, levelWeights[, scaleFactor[, minNeighbors[, flags[, minSize[, maxSize[, outputRejectLevels]]]]]]) -> objects
-    rects = cascade.detectMultiScale(img, scaleFactor=1.3, minNeighbors=1, minSize=minimumFeatureSize, flags = cv.CV_HAAR_SCALE_IMAGE)
+def detect(img, cascade, minimumFeatureSize=(20,20)):
+    if cascade.empty():
+        raise(Exception("There was a problem loading your Haar Cascade xml file."))
+    rects = cascade.detectMultiScale(img, scaleFactor=1.3, minNeighbors=1, minSize=minimumFeatureSize)
     if len(rects) == 0:
         return []
     rects[:,2:] += rects[:,:2] #convert last coord from (width,height) to (maxX, maxY)
@@ -401,8 +402,8 @@ def draw_rects(img, rects, color):
 
 
 # init the filters we'll use below
-haarFaceCascade = cv2.CascadeClassifier("./haarcascade_frontalface_alt.xml")
-haarEyeCascade = cv2.CascadeClassifier("./haarcascade_eye.xml")
+haarFaceCascade = cv2.CascadeClassifier("./haarcascades/haarcascade_frontalface_alt.xml")
+haarEyeCascade = cv2.CascadeClassifier("./haarcascades/haarcascade_eye.xml")
 #img.listHaarFeatures() displays these Haar options:
 #['eye.xml', 'face.xml', 'face2.xml', 'face3.xml', 'face4.xml', 'fullbody.xml', 'glasses.xml', 'lefteye.xml', #'left_ear.xml', 'left_eye2.xml', 'lower_body.xml', 'mouth.xml', 'nose.xml', 'profile.xml',
 #'right_ear.xml', 'right_eye.xml', 'right_eye2.xml', 'two_eyes_big.xml', 'two_eyes_small.xml', 'upper_body.xml', #'upper_body2.xml']
@@ -416,7 +417,7 @@ nOctaves = 4
 nOctaveLayers = 2
 extended = True
 upright = True
-detector = cv2.SURF(hessianThreshold, nOctaves, nOctaveLayers, extended, upright)
+detector = cv2.xfeatures2d.SURF_create(hessianThreshold, nOctaves, nOctaveLayers, extended, upright)
 #figure out a way to nearest neighbor map to index
 virtualpoint = None
 warm=0
@@ -425,7 +426,7 @@ warm=0
 # INPUTS:
 # frame - a color numpy image.
 # allowDebugDisplay - pass True if you want it to draw pupil centers, etc on "frame" and then display it.
-# Display requires that you called this line to create the window: previewWindow = cv2.namedWindow("preview")
+# Display requires that you called this line to create the window: previewWindow = cv2.namedWindow(WINDOW_NAME)
 # trackAverageOffset - output will be a moving average rather than instantaneous value
 # directInferenceLeftRight - combines probability images from left and right to hopefully reduce noise in estimation of pupil offset
 # Returns a list of two tuples of pupil offsets from the forehead dot. Specifically:
@@ -534,20 +535,17 @@ def getOffset(frame, allowDebugDisplay=True, trackAverageOffset=True, directInfe
                 face = faces[0]#expect the first one
                 faceImg = gray[face[1]:face[3], face[0]:face[2]]
                 cornerImg = gray[corner[1]:corner[3], corner[0]:corner[2]]
-                if virtualpoint == None:
-                    #we haven't set up the reference point yet
-    ##                import pdb
-    ##                pdb.set_trace()
-                    haystackKeypoints, haystackDescriptors = detector.detect(gray, None, useProvidedKeypoints = False)
+                if virtualpoint == None: #we haven't set up the reference point yet
+                    haystackKeypoints = detector.detect(gray)
+                    haystackKeypoints, haystackDescriptors = detector.compute(gray, haystackKeypoints)
                     if len(haystackKeypoints) != 0:
                         betweenEyes = (np.array(featureCenterXY(leftEye_rightEye[0]))+np.array(featureCenterXY(leftEye_rightEye[1])))/2
                         virtualpoint = ClassyVirtualReferencePoint.ClassyVirtualReferencePoint(haystackKeypoints, haystackDescriptors, (betweenEyes[0], betweenEyes[1]), face, leftEye_rightEye[0], leftEye_rightEye[1])
                     else:
                         print "begin fail"
-                else:
-                    #we've already created it
-                    keypoints, descriptors = detector.detect(gray, None, useProvidedKeypoints = False)
-                    #keypoints, descriptors = detector.detect(faceImg, None, useProvidedKeypoints = False)
+                else: #we've already created it
+                    keypoints = detector.detect(gray)
+                    keypoints, descriptors =detector.compute(gray, keypoints)
                     if drawKeypoints:
                         imgToDrawOn = output
                     else:
@@ -574,14 +572,14 @@ def getOffset(frame, allowDebugDisplay=True, trackAverageOffset=True, directInfe
 
         if allowDebugDisplay and showMainImg:
             # Double size
-            cv2.imshow("preview", cv2.resize(output,(0,0), fx=2,fy=2,interpolation=cv2.INTER_NEAREST) )
+            cv2.imshow(WINDOW_NAME, cv2.resize(output,(0,0), fx=2,fy=2,interpolation=cv2.INTER_NEAREST) )
             # original size
 
         return tuple(pupilXYList) # if trackAverageOffset, it's length 2 and holds the average offset. Else, it's length 4 (old code)
 
     else: # no valid face was found
         if allowDebugDisplay:
-            cv2.imshow("preview", cv2.resize(output,(0,0), fx=2,fy=2,interpolation=cv2.INTER_NEAREST) )
+            cv2.imshow(WINDOW_NAME, cv2.resize(output,(0,0), fx=2,fy=2,interpolation=cv2.INTER_NEAREST) )
         return None
 
 
@@ -649,26 +647,27 @@ def fitTransformation(OffsetsAndPixels):
     HT = np.linalg.lstsq(offsets, pixels)[0] # returns a tuple, where index 0 is the solution matrix.
     return HT
 
-
+WINDOW_NAME = "preview"
 def main():
-    previewWindow = cv2.namedWindow("preview") # open a window to show debugging images
-
+    previewWindow = cv2.namedWindow(WINDOW_NAME) # open a window to show debugging images
     vc = cv2.VideoCapture(0) # Initialize the default camera
-    if vc.isOpened(): # try to get the first frame
-        (readSuccessful, frame) = vc.read()
-    else:
-        readSuccessful = False
-
-    while readSuccessful:
-        pupilOffsetXYList = getOffset(frame, allowDebugDisplay=True)
-        key = cv2.waitKey(10)
-        if key == 27: # exit on ESC
-            cv2.imwrite( "lastOutput.png", frame) #save the last-displayed image to file, for our report
-            break
-        # Get Image from camera
-        readSuccessful, frame = vc.read()
-    vc.release() #close the camera
-    cv2.destroyWindow("preview") #close the window
+    try:
+        if vc.isOpened(): # try to get the first frame
+            (readSuccessful, frame) = vc.read()
+        else:
+            readSuccessful = False
+    
+        while readSuccessful:
+            pupilOffsetXYList = getOffset(frame, allowDebugDisplay=True)
+            key = cv2.waitKey(10)
+            if key == 27: # exit on ESC
+                cv2.imwrite( "lastOutput.png", frame) #save the last-displayed image to file, for our report
+                break
+            # Get Image from camera
+            readSuccessful, frame = vc.read()
+    finally:
+        vc.release() #close the camera
+        cv2.destroyWindow(WINDOW_NAME) #close the window
 
 def mainForTraining():
     import pygamestuff
@@ -683,41 +682,45 @@ def mainForTraining():
     MAX_SAMPLES_TO_RECORD = 999999
     recordedEvents=0
     HT = None
-    while readSuccessful and recordedEvents < MAX_SAMPLES_TO_RECORD and not crosshair.userWantsToQuit:
-        pupilOffsetXYList = getOffset(frame, allowDebugDisplay=False)
-        if pupilOffsetXYList is not None: #If we got eyes, check for a click. Else, wait until we do.
-            if crosshair.pollForClick():
-                crosshair.clearEvents()
-                #print( (xOffset,yOffset) )
-                #do learning here, to relate xOffset and yOffset to screenX,screenY
-                crosshair.record(pupilOffsetXYList)
-                print "recorded something"
-                crosshair.remove()
-                recordedEvents += 1
-                if recordedEvents > RANSAC_MIN_INLIERS:
-##                    HT = fitTransformation(np.array(crosshair.result))
-                    resultXYpxpy =np.array(crosshair.result)
-                    features = getFeatures(resultXYpxpy[:,:-2])
-                    featuresAndLabels = np.concatenate( (features, resultXYpxpy[:,-2:] ) , axis=1)
-                    HT = RANSACFitTransformation(featuresAndLabels)
-                    print HT
-            if HT is not None: # draw predicted eye position
-                currentFeatures =getFeatures( np.array( (pupilOffsetXYList[0], pupilOffsetXYList[1]) ))
-                gazeCoords = currentFeatures.dot(HT)
-                crosshair.drawCrossAt( (gazeCoords[0,0], gazeCoords[0,1]) )
-        readSuccessful, frame = vc.read()
+    try:
+        while readSuccessful and recordedEvents < MAX_SAMPLES_TO_RECORD and not crosshair.userWantsToQuit:
+            pupilOffsetXYList = getOffset(frame, allowDebugDisplay=False)
+            if pupilOffsetXYList is not None: #If we got eyes, check for a click. Else, wait until we do.
+                if crosshair.pollForClick():
+                    crosshair.clearEvents()
+                    #print( (xOffset,yOffset) )
+                    #do learning here, to relate xOffset and yOffset to screenX,screenY
+                    crosshair.record(pupilOffsetXYList)
+                    print "recorded something"
+                    crosshair.remove()
+                    recordedEvents += 1
+                    if recordedEvents > RANSAC_MIN_INLIERS:
+    ##                    HT = fitTransformation(np.array(crosshair.result))
+                        resultXYpxpy =np.array(crosshair.result)
+                        features = getFeatures(resultXYpxpy[:,:-2])
+                        featuresAndLabels = np.concatenate( (features, resultXYpxpy[:,-2:] ) , axis=1)
+                        HT = RANSACFitTransformation(featuresAndLabels)
+                        print HT
+                if HT is not None: # draw predicted eye position
+                    currentFeatures =getFeatures( np.array( (pupilOffsetXYList[0], pupilOffsetXYList[1]) ))
+                    gazeCoords = currentFeatures.dot(HT)
+                    crosshair.drawCrossAt( (gazeCoords[0,0], gazeCoords[0,1]) )
+            readSuccessful, frame = vc.read()
+    
+        print "writing"
+        crosshair.write() #writes data to a csv for MATLAB
+        crosshair.close()
+        print "HT:\n"
+        print HT
+        resultXYpxpy =np.array(crosshair.result)
+        print "eyeData:\n"
+        print getFeatures(resultXYpxpy[:,:-2])
+        print "resultXYpxpy:\n"
+        print resultXYpxpy[:,-2:]
+    finally:
+        vc.release() #close the camera
+    
 
-    print "writing"
-    crosshair.write() #writes data to a csv for MATLAB
-    vc.release() #close the camera
-    crosshair.close()
-    print "HT:\n"
-    print HT
-    resultXYpxpy =np.array(crosshair.result)
-    print "eyeData:\n"
-    print getFeatures(resultXYpxpy[:,:-2])
-    print "resultXYpxpy:\n"
-    print resultXYpxpy[:,-2:]
 
 
 
