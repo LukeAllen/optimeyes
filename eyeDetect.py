@@ -536,16 +536,14 @@ def getOffset(frame, allowDebugDisplay=True, trackAverageOffset=True, directInfe
                 faceImg = gray[face[1]:face[3], face[0]:face[2]]
                 cornerImg = gray[corner[1]:corner[3], corner[0]:corner[2]]
                 if virtualpoint == None: #we haven't set up the reference point yet
-                    haystackKeypoints = detector.detect(gray)
-                    haystackKeypoints, haystackDescriptors = detector.compute(gray, haystackKeypoints)
+                    haystackKeypoints, haystackDescriptors = detector.detectAndCompute(gray, mask=None)
                     if len(haystackKeypoints) != 0:
                         betweenEyes = (np.array(featureCenterXY(leftEye_rightEye[0]))+np.array(featureCenterXY(leftEye_rightEye[1])))/2
                         virtualpoint = ClassyVirtualReferencePoint.ClassyVirtualReferencePoint(haystackKeypoints, haystackDescriptors, (betweenEyes[0], betweenEyes[1]), face, leftEye_rightEye[0], leftEye_rightEye[1])
                     else:
                         print "begin fail"
                 else: #we've already created it
-                    keypoints = detector.detect(gray)
-                    keypoints, descriptors =detector.compute(gray, keypoints)
+                    keypoints, descriptors = detector.detectAndCompute(gray, mask=None)
                     if drawKeypoints:
                         imgToDrawOn = output
                     else:
