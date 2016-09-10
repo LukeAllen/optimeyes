@@ -5,10 +5,35 @@ Read the Optimeyes Theory Paper above to see principles of operation. The major 
 
 To use the project on your computer:
 
-- Option 1 (easiest setup): use the "master" branch of this repo, and install SimpleCV 1.3 from simplecv.org. Ensure your OpenCV version is 2.x (version 3.x has different function signatures)
-- Option 2 (slightly higher performance): use the "opencv3" branch of this repo, and install OpenCV 3.0 from opencv.org.
-- run eyeDetect.py. 
+- install OpenCV 3 from opencv.org. The following command should do it on Ubuntu Linux (the command comes from this excellent [guide](http://www.pyimagesearch.com/2015/06/22/install-opencv-3-0-and-python-2-7-on-ubuntu/). The same page has installation instructions for other OSes.)
+```
+mkdir ~/opencv-build && \
+cd ~/opencv-build && \
+git clone https://github.com/opencv/opencv.git && \
+git clone https://github.com/opencv/opencv_contrib.git && \
+cd opencv && \
+mkdir build && \
+cd build && \
+cmake -D CMAKE_BUILD_TYPE=RELEASE \
+	-D CMAKE_INSTALL_PREFIX=/usr/local \
+	-D INSTALL_C_EXAMPLES=OFF \
+	-D INSTALL_PYTHON_EXAMPLES=OFF \
+	-D OPENCV_EXTRA_MODULES_PATH=~/opencv-build/opencv_contrib/modules \
+	-D BUILD_EXAMPLES=OFF ..  && \
+make -j4 && \
+sudo make install && \
+sudo ldconfig && \
+cd ~ && rm -rf opencv-build
+```
+- clone this repo and run ```sudo pip install requirements.txt'''
+- run eyeDetect.py.
 
-If the "doTraining" variable at the top of eyeDetect.py is False, it will display pupil centers graphically as shown in the report. Do that first, to verify lighting conditions, webcam field of view, etc. 
+On your first run, ensure the "doTraining" variable at the top of eyeDetect.py is False. This makes it display pupil centers graphically, as depicted in the Theory Paper. The green line from the virtual reference point to your pupil should be stable and should track your eye movement. It helps to get as close to the camera as you can, and be well-lit.
 
-If "doTraining" is true, it will produce a Pygame window. Gaze at the mouse cursor for 1 second to let things stabilize, click the mouse, and repeat at a new position (for good results you must wait 1 second before clicking, every time). When enough training data has been collected to yield a good fit (typically 10 to 30 clicks), a blue blur will appear centered at the predicted eye gaze position. You can do more clicks to further improve the fit. Be sure to keep your head as stationary as possible the whole time. (Don't move OR rotate your head at all.)
+Set "doTraining" to True and run again. It will produce a Pygame window. To train the gaze detector, keep your head perfectly still and do the following repeatedly:
+- Move the mouse cursor to a random point in the window.
+- Gaze at the mouse cursor
+- Hold your gaze steady for 2 seconds to ensure it detects your pupils
+- Click the mouse
+
+When enough training data has been collected to yield a good fit (typically 10 to 30 clicks), a blue blur will appear centered at the predicted eye gaze position. You can do more clicks to further improve the fit. For best results, include a lot of points on the extreme left and right sides of the window. Be sure to keep your head as stationary as possible the whole time. (Don't move OR rotate your head at all.)

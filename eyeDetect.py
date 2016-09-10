@@ -1,13 +1,7 @@
-#from SimpleCV import *
 import cv2
-#import cv2.cv as cv
 import numpy as np
 import ClassyVirtualReferencePoint as ClassyVirtualReferencePoint
 import ransac
-
-false = False
-true = True
-
 
 # set doTraining = False to display debug graphics:
 # You should do this first. There should be a green line from your
@@ -647,12 +641,13 @@ def fitTransformation(OffsetsAndPixels):
 
 WINDOW_NAME = "preview"
 def main():
-    previewWindow = cv2.namedWindow(WINDOW_NAME) # open a window to show debugging images
+    cv2.namedWindow(WINDOW_NAME) # open a window to show debugging images
     vc = cv2.VideoCapture(0) # Initialize the default camera
     try:
         if vc.isOpened(): # try to get the first frame
             (readSuccessful, frame) = vc.read()
         else:
+            raise(Exception("failed to open camera."))
             readSuccessful = False
     
         while readSuccessful:
@@ -674,7 +669,7 @@ def mainForTraining():
     if vc.isOpened(): # try to get the first frame
         (readSuccessful, frame) = vc.read()
     else:
-        print("Could not open camera.")
+        raise(Exception("failed to open camera."))
         return
 
     MAX_SAMPLES_TO_RECORD = 999999
