@@ -1,12 +1,15 @@
+## Optimeyes
+A demo of pupil tracking using a normal webcam. *Note: this is just a proof of concept, not a production library. Contributors are welcome though.*
+
 Read the Optimeyes Theory Paper above to see principles of operation. The major advances relative to other code are:
 
 1. The virtual reference point, which uses multiple unreliable keypoints to derive a very reliable reference point on the face.
 2. The method of overlaying one eye's pupil-probability image on the other, to greatly increase confidence of the estimate.
 
-To use the project on your computer:
+### To run the project
 
-- install OpenCV 3 from opencv.org. The following command should do it on Ubuntu Linux (the command comes from this excellent [guide](http://www.pyimagesearch.com/2015/06/22/install-opencv-3-0-and-python-2-7-on-ubuntu/). The same page has installation instructions for other OSes.)
-```
+- Install OpenCV 3 from opencv.org. The following command should do it on Ubuntu Linux (the command comes from this excellent [guide](http://www.pyimagesearch.com/2015/06/22/install-opencv-3-0-and-python-2-7-on-ubuntu/). The same page has installation instructions for other OSes.)
+```bash
 mkdir ~/opencv-build && \
 cd ~/opencv-build && \
 git clone https://github.com/opencv/opencv.git && \
@@ -25,12 +28,12 @@ sudo make install && \
 sudo ldconfig && \
 cd ~ && rm -rf opencv-build
 ```
-- clone this repo and run ```sudo pip install requirements.txt'''
-- run eyeDetect.py.
+- Clone this repo and run ```sudo pip install requirements.txt```
+- Run eyeDetect.py.
 
-On your first run, ensure the "doTraining" variable at the top of eyeDetect.py is False. This makes it display pupil centers graphically, as depicted in the Theory Paper. The green line from the virtual reference point to your pupil should be stable and should track your eye movement. It helps to get as close to the camera as you can, and be well-lit.
+On your first run, ensure the "doTraining" variable at the top of eyeDetect.py is False. This makes it display pupil centers graphically, as depicted in the Theory Paper. The green line from the virtual reference point to your pupil should be stable and should track your eye movement. It helps to get as close to the camera as you can-- your eyes should be >30 pixels tall. And your face should be well-lit, so that your pupils are clearly visible. (Note: you'll need to restart the program every time you move your head or change lighting conditions.)
 
-Set "doTraining" to True and run again. It will produce a Pygame window. To train the gaze detector, keep your head perfectly still and do the following repeatedly:
+When the pupil tracking looks good, set "doTraining" to True and run again. It will produce a Pygame window. To train the gaze detector, keep your head perfectly still and do the following repeatedly:
 - Move the mouse cursor to a random point in the window.
 - Gaze at the mouse cursor
 - Hold your gaze steady for 2 seconds to ensure it detects your pupils
