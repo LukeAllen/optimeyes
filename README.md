@@ -8,8 +8,11 @@ Read the Optimeyes Theory Paper above to see principles of operation. The major 
 
 ### To run the project
 
-- Install OpenCV 3 from opencv.org. The following command should do it on Ubuntu Linux (the command comes from this excellent [guide](http://www.pyimagesearch.com/2015/06/22/install-opencv-3-0-and-python-2-7-on-ubuntu/). The same page has installation instructions for other OSes.)
+- Install OpenCV 3 from opencv.org. The following two commands should do it on Ubuntu Linux (based on this excellent [guide](http://www.pyimagesearch.com/2015/06/22/install-opencv-3-0-and-python-2-7-on-ubuntu/). That page also has installation guides for other OSes.)
+
 ```bash
+apt-get update && apt-get install -y --no-install-recommends build-essential python-dev cmake git pkg-config libjpeg8-dev libjasper-dev libpng12-dev libgtk2.0-dev libavcodec-dev libavformat-dev libswscale-dev libv4l-dev libatlas-base-dev gfortran
+
 mkdir ~/opencv-build && \
 cd ~/opencv-build && \
 git clone https://github.com/opencv/opencv.git && \
@@ -28,6 +31,7 @@ sudo make install && \
 sudo ldconfig && \
 cd ~ && rm -rf opencv-build
 ```
+
 - Clone this repo and run ```sudo pip install requirements.txt```
 - Run eyeDetect.py.
 
