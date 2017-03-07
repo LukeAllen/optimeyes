@@ -8,7 +8,7 @@ Read the Optimeyes Theory Paper above to see principles of operation. The major 
 
 ### To run the project
 
-## Installing OpenCV
+#### Installing OpenCV
 
 - Installation on Windows
 
