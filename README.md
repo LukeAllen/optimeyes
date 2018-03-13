@@ -8,7 +8,16 @@ Read the Optimeyes Theory Paper above to see principles of operation. The major 
 
 ### To run the project
 
-- Install OpenCV 3 from opencv.org. The following two commands should do it on Ubuntu Linux (based on this excellent [guide](http://www.pyimagesearch.com/2015/06/22/install-opencv-3-0-and-python-2-7-on-ubuntu/). That page also has installation guides for other OSes.)
+#### Installing OpenCV
+
+- Installation on Windows
+
+Follow the instructions on how to build OpenCV 3 via this video : [Build OpenCV] (https://www.youtube.com/watch?v=MXqpHIMdKfU&feature=youtu.be)
+
+
+- Installation on Linux
+
+Install OpenCV 3 from opencv.org. The following two commands should do it on Ubuntu Linux (based on this excellent [guide](http://www.pyimagesearch.com/2015/06/22/install-opencv-3-0-and-python-2-7-on-ubuntu/). That page also has installation guides for other OSes.)
 
 ```bash
 apt-get update && apt-get install -y --no-install-recommends build-essential python-dev cmake git pkg-config libjpeg8-dev libjasper-dev libpng12-dev libgtk2.0-dev libavcodec-dev libavformat-dev libswscale-dev libv4l-dev libatlas-base-dev gfortran
